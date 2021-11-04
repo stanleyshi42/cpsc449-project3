@@ -1,6 +1,5 @@
 import hug
 import redis
-import requests
 
 
 r = redis.Redis()
