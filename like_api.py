@@ -22,14 +22,21 @@ redisKey += 1
 @hug.get("/{username}/likes/")
 def retrieve_user_likes(response, username: hug.types.text):
     """GET a list of posts that a user has liked"""
+    posts = []
 
     try:
-        pass
+        # Iterate through all hashes
+        for i in range(redisKey):
+            likes = r.hgetall(i)
+            # Decode dict of bytes to strings
+            likes = {key.decode(): value.decode() for key, value in likes.items()}
+            if likes["username"] == username:
+                posts.append(likes["post_id"])
     except Exception as e:
         response.status = hug.falcon.HTTP_409
         return {"error": str(e)}
 
-    # return {"likes": likes}
+    return {"liked_posts": posts}
 
 
 @hug.get("/posts/{post_id}/likes/")
