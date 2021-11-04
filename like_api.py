@@ -7,37 +7,55 @@ r = redis.Redis()
 redisKey = 0
 r.flushall()
 
+r.hmset(redisKey, {"username": "jack_jackson", "post_id": 0})
+redisKey += 1
+r.hmset(redisKey, {"username": "john_johnson", "post_id": 3})
+redisKey += 1
+r.hmset(redisKey, {"username": "jack_jackson", "post_id": 2})
+redisKey += 1
+r.hmset(redisKey, {"username": "stan98", "post_id": 0})
+redisKey += 1
+r.hmset(redisKey, {"username": "stan98", "post_id": 1})
+redisKey += 1
 
 # TODO APIs
-'''
-@hug.get("/likes/{username}")
-def retrieve_user_likes(response, id: hug.types.number):
-    """GET a list of posts that a user liked"""
-    likes = []
-    try:
-        post = db["posts"].get(id)
-        posts.append(post)
-    except sqlite_utils.db.NotFoundError:
-        response.status = hug.falcon.HTTP_404
-    return {"likes": likes}
+@hug.get("/{username}/likes/")
+def retrieve_user_likes(response, username: hug.types.text):
+    """GET a list of posts that a user has liked"""
 
-@hug.get("/likes/{id}")
-def retrieve_post_likes(response, id: hug.types.number):
+    try:
+        pass
+    except Exception as e:
+        response.status = hug.falcon.HTTP_409
+        return {"error": str(e)}
+
+    # return {"likes": likes}
+
+
+@hug.get("/posts/{post_id}/likes/")
+def retrieve_post_likes(response, post_id: hug.types.number):
     """GET the number of likes a post has"""
-    likes = []
+    like_count = 0
+
     try:
-        post = db["posts"].get(id)
-        posts.append(post)
-    except sqlite_utils.db.NotFoundError:
-        response.status = hug.falcon.HTTP_404
-    return {"likes": likes}
-'''
+        # Iterate through all hashes
+        for i in range(redisKey):
+            likes = r.hgetall(i)
+            # Decode dict of bytes to strings
+            likes = {key.decode(): value.decode() for key, value in likes.items()}
+            if int(likes["post_id"]) == post_id:
+                like_count += 1
+    except Exception as e:
+        response.status = hug.falcon.HTTP_409
+        return {"error": str(e)}
+
+    return {"post_id": post_id, "likes": like_count}
 
 
-@hug.post("/likes/", status=hug.falcon.HTTP_201)
+@hug.post("/posts/{post_id}/likes/", status=hug.falcon.HTTP_201)
 def like_post(
     username: hug.types.text,
-    post: hug.types.number,
+    post_id: hug.types.number,
     response,
 ):
     """POST a new like"""
@@ -45,7 +63,7 @@ def like_post(
 
     like = {
         "username": username,
-        "post_id": post,
+        "post_id": post_id,
     }
 
     try:
