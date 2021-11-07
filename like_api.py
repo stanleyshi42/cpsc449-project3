@@ -6,6 +6,8 @@ r = redis.Redis()
 redisKey = 0
 r.flushall()
 
+
+# Insert sample data into Redis
 r.hmset(redisKey, {"username": "jack_jackson", "post_id": 0})
 redisKey += 1
 r.hmset(redisKey, {"username": "john_johnson", "post_id": 3})
@@ -17,7 +19,7 @@ redisKey += 1
 r.hmset(redisKey, {"username": "stan98", "post_id": 1})
 redisKey += 1
 
-# TODO APIs
+
 @hug.get("/{username}/likes/")
 def retrieve_user_likes(response, username: hug.types.text):
     """GET a list of posts that a user has liked"""
@@ -80,3 +82,5 @@ def like_post(
         return {"error": str(e)}
 
     return like
+
+#TODO API to GET popular posts

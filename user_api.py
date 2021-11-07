@@ -6,10 +6,12 @@ from sqlite_utils import Database
 
 db = Database(sqlite3.connect("./var/users.db"))
 
+
 @hug.get("/users/")
 def retrieve_users():
     """GET all users"""
     return {"users": db["users"].rows}
+
 
 @hug.get("/users/{username}")
 def retrieve_user(response, username: hug.types.text):
@@ -21,6 +23,7 @@ def retrieve_user(response, username: hug.types.text):
     except sqlite_utils.db.NotFoundError:
         response.status = hug.falcon.HTTP_404
     return {"users": users}
+
 
 @hug.post("/users/", status=hug.falcon.HTTP_201)
 def create_user(
@@ -49,6 +52,7 @@ def create_user(
     response.set_header("Location", f"/users/{user['username']}")
     return user
 
+
 @hug.get("/users/{username}/following")
 def retrieve_following(response, username: hug.types.text):
     """GET a user's following list"""
@@ -59,6 +63,7 @@ def retrieve_following(response, username: hug.types.text):
     except sqlite_utils.db.NotFoundError:
         response.status = hug.falcon.HTTP_404
     return {"users": users}
+
 
 @hug.post("/users/{username}/following", status=hug.falcon.HTTP_201)
 def create_following(

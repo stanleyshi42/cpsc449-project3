@@ -8,32 +8,38 @@ import datetime
 
 db = Database(sqlite3.connect("./var/posts.db"))
 
+
 def authenticate_user(username, password):
     """Authenticates a user"""
     r = requests.get("http://localhost:8000/users/" + username)
     user = r.json()
-    user = user["users"][0]     # Gets the user we want to auth
+    user = user["users"][0]  # Gets the user we want to auth
 
     if user["password"] == password:
         return user
     return False
 
+
 @hug.get("/public_timeline/")
 def public_timeline():
     """GET the Public Timeline; sorted by timestamp"""
     # Return in JSON format
-    return {"posts": db["posts"].rows_where(order_by = "timestamp desc")}
+    return {"posts": db["posts"].rows_where(order_by="timestamp desc")}
+
 
 @hug.get("/user_timeline/{username}")
 def user_timeline(response, username: hug.types.text):
     """GET a user's User Timeline; sorted by timestamp"""
     posts = []
     try:
-        for row in db["posts"].rows_where("username = ?", [username], order_by = "timestamp desc"):
+        for row in db["posts"].rows_where(
+            "username = ?", [username], order_by="timestamp desc"
+        ):
             posts.append(row)
     except sqlite_utils.db.NotFoundError:
         response.status = hug.falcon.HTTP_404
     return {"posts": posts}
+
 
 @hug.get("/home_timeline/", requires=hug.authentication.basic(authenticate_user))
 def home_timeline(
@@ -61,6 +67,7 @@ def home_timeline(
         response.status = hug.falcon.HTTP_404
     return {"posts": posts}
 
+
 @hug.get("/posts/{id}")
 def retrieve_post(response, id: hug.types.number):
     """GET a post by its ID"""
@@ -72,7 +79,12 @@ def retrieve_post(response, id: hug.types.number):
         response.status = hug.falcon.HTTP_404
     return {"posts": posts}
 
-@hug.post("/posts/", status=hug.falcon.HTTP_201, requires=hug.authentication.basic(authenticate_user))
+
+@hug.post(
+    "/posts/",
+    status=hug.falcon.HTTP_201,
+    requires=hug.authentication.basic(authenticate_user),
+)
 def create_post(
     user: hug.directives.user,
     text: hug.types.text,
