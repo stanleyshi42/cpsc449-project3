@@ -64,7 +64,7 @@ def retrieve_post_likes(response, post_id: hug.types.number):
 def like_post(
     username: hug.types.text,
     post_id: hug.types.number,
-    response,
+    response
 ):
     """POST a new like"""
     global redisKey
