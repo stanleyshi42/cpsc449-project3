@@ -20,7 +20,11 @@ r.hmset(redisKey, {"username": "stan98", "post_id": 1})
 redisKey += 1
 
 
-@hug.get("/{username}/likes/")
+@hug.get("/health/")
+def health():
+    return {"health": "alive"}
+
+@hug.get("/users/{username}/likes/")
 def retrieve_user_likes(response, username: hug.types.text):
     """GET a list of posts that a user has liked"""
     posts = []

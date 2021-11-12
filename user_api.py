@@ -7,6 +7,11 @@ from sqlite_utils import Database
 db = Database(sqlite3.connect("./var/users.db"))
 
 
+@hug.get("/health/")
+def health():
+    return {"health": "alive"}
+
+
 @hug.get("/users/")
 def retrieve_users():
     """GET all users"""

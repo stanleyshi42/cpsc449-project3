@@ -19,6 +19,9 @@ def authenticate_user(username, password):
         return user
     return False
 
+@hug.get("/health/")
+def health():
+    return {"health": "alive"}
 
 @hug.get("/public_timeline/")
 def public_timeline():
