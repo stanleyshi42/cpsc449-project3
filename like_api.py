@@ -4,7 +4,7 @@ import redis
 
 r = redis.Redis()
 redisKey = 0
-r.flushall()
+# r.flushall()
 
 
 # Insert sample data into Redis
@@ -18,11 +18,18 @@ r.hmset(redisKey, {"username": "stan98", "post_id": 0})
 redisKey += 1
 r.hmset(redisKey, {"username": "stan98", "post_id": 1})
 redisKey += 1
+r.hmset(redisKey, {"username": "bob_bobson", "post_id": 0})
+redisKey += 1
+r.hmset(redisKey, {"username": "stan98", "post_id": 3})
+redisKey += 1
+r.hmset(redisKey, {"username": "john_johnson", "post_id": 0})
+redisKey += 1
 
 
 @hug.get("/health/")
 def health():
     return {"health": "alive"}
+
 
 @hug.get("/users/{username}/likes/")
 def retrieve_user_likes(response, username: hug.types.text):
@@ -65,11 +72,7 @@ def retrieve_post_likes(response, post_id: hug.types.number):
 
 
 @hug.post("/posts/{post_id}/likes/", status=hug.falcon.HTTP_201)
-def like_post(
-    username: hug.types.text,
-    post_id: hug.types.number,
-    response
-):
+def like_post(username: hug.types.text, post_id: hug.types.number, response):
     """POST a new like"""
     global redisKey
 
@@ -87,4 +90,8 @@ def like_post(
 
     return like
 
-#TODO API to GET popular posts
+
+# TODO GET popular posts
+@hug.get("/posts/popular/", status=hug.falcon.HTTP_201)
+def retreive_popular_posts(response):
+    pass
