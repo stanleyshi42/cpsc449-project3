@@ -3,13 +3,11 @@ import threading
 import requests
 import time
 
-# Hard coded ports
-#services = ["http://localhost:4000","http://localhost:4100","http://localhost:4200","http://localhost:4300",]
-services = []
+services = []  # Holds address of each service
 
 
 def check_service():
-    '''Periodically performs a health check on each service in the registry'''
+    """Periodically performs a health check on each service in the registry"""
     while True:
         global services
         for url in services:
@@ -40,6 +38,7 @@ def register(
 
 # @hug.startup()
 def health_check():
+    """Creates a daemon thread for performing health checks"""
     x = threading.Thread(target=check_service, args=(), daemon=True)
     x.start()
 
