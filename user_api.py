@@ -95,7 +95,6 @@ def create_following(
 
 
 @hug.startup()
-@hug.post(status=hug.falcon.HTTP_201)
 def register(url: hug.types.text):
     """Register with the Service Registry"""
     port = os.environ.get("PORT")
