@@ -1,5 +1,7 @@
 import hug
 import redis
+import requests
+import os
 
 
 r = redis.Redis()
@@ -26,7 +28,7 @@ r.hmset(redisKey, {"username": "john_johnson", "post_id": 0})
 redisKey += 1
 
 
-@hug.get("/health/")
+@hug.get("/health-check/")
 def health():
     return {"health": "alive"}
 
@@ -95,3 +97,13 @@ def like_post(username: hug.types.text, post_id: hug.types.number, response):
 @hug.get("/posts/popular/", status=hug.falcon.HTTP_201)
 def retreive_popular_posts(response):
     pass
+
+
+@hug.startup()
+@hug.post(status=hug.falcon.HTTP_201)
+def register(url: hug.types.text):
+    """Register with the Service Registry"""
+    port = os.environ.get("PORT")
+    url = 'http://localhost:'+port
+    requests.post("http://localhost:4400/register/",data={'url':url})
+    print('done')

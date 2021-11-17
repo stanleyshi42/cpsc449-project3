@@ -2,31 +2,50 @@ import hug
 import threading
 import requests
 import time
-import os
-import socket
+
+# Hard coded ports for each service
+services = [
+    "http://localhost:4000",
+    "http://localhost:4100",
+    "http://localhost:4200",
+    "http://localhost:4300",
+]
+# services = []
 
 
-def check_service(ports):
+def check_service():
     while True:
-        for port in ports:
-            print("Port:", port)
-            r = requests.get("http://localhost:" + str(port) + "/health")
-            print("Status code:", r.status_code)
+        global services
+        for url in services:
+            r = requests.get(url + "/health-check")
+            # Remove service if it doesn't pass health check
             if r.status_code != 200:
-                pass
+                services.remove(url)
 
         time.sleep(60)
 
 
-@hug.startup()
+@hug.post("/register/", status=hug.falcon.HTTP_201)
+def register(
+    url: hug.types.text,
+    response,
+):
+    """POST a new service to the registry"""
+
+    print("Registry input:", url)
+    try:
+        services.append(url)
+        print(services)
+    except Exception as e:
+        response.status = hug.falcon.HTTP_409
+        return {"error": str(e)}
+    return url
+
+
+# @hug.startup()
 def health_check():
-    # TODO get service ports
-    print("Environ get:", os.environ.get("PORT"))
-    ports = [8000, 8100]
-
-    x = threading.Thread(target=check_service, args=(ports,), daemon=True)
+    x = threading.Thread(target=check_service, args=(), daemon=True)
     x.start()
-    time.sleep(60)
 
 
-# health_check()
+health_check()

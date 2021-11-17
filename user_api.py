@@ -2,12 +2,13 @@ import hug
 import sqlite3
 import sqlite_utils
 from sqlite_utils import Database
-
+import requests
+import os
 
 db = Database(sqlite3.connect("./var/users.db"))
 
 
-@hug.get("/health/")
+@hug.get("/health-check/")
 def health():
     return {"health": "alive"}
 
@@ -91,3 +92,12 @@ def create_following(
 
     response.set_header("Location", f"/following/{follower['id']}")
     return follower
+
+@hug.startup()
+@hug.post(status=hug.falcon.HTTP_201)
+def register(url: hug.types.text):
+    """Register with the Service Registry"""
+    port = os.environ.get("PORT")
+    url = 'http://localhost:'+port
+    requests.post("http://localhost:4400/register/",data={'url':url})
+    print('done')

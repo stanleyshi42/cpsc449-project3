@@ -1,13 +1,14 @@
 import hug
 import boto3
-from boto3.dynamodb.conditions import Key
+import requests
+import os
 
 
 poll_id = 0
 dynamodb = boto3.resource("dynamodb", endpoint_url="http://localhost:8000")
 
 
-@hug.get("/health/")
+@hug.get("/health-check/")
 def health():
     return {"health": "alive"}
 
@@ -64,7 +65,7 @@ def create_poll(
     }
 
 
-# TODO
+# TODO get a poll
 @hug.get("/polls/{poll_id}", status=hug.falcon.HTTP_201)
 def retrieve_poll(poll_id: hug.types.number, response):
     table = dynamodb.Table("Polls")
@@ -81,3 +82,12 @@ def retrieve_poll(poll_id: hug.types.number, response):
         return {"error": str(e.response["Error"]["Message"])}
     print(response)
     return response["Item"]
+
+@hug.startup()
+@hug.post(status=hug.falcon.HTTP_201)
+def register(url: hug.types.text):
+    """Register with the Service Registry"""
+    port = os.environ.get("PORT")
+    url = 'http://localhost:'+port
+    requests.post("http://localhost:4400/register/",data={'url':url})
+    print('done')
