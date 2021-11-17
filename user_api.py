@@ -93,11 +93,11 @@ def create_following(
     response.set_header("Location", f"/following/{follower['id']}")
     return follower
 
+
 @hug.startup()
 @hug.post(status=hug.falcon.HTTP_201)
 def register(url: hug.types.text):
     """Register with the Service Registry"""
     port = os.environ.get("PORT")
-    url = 'http://localhost:'+port
-    requests.post("http://localhost:4400/register/",data={'url':url})
-    print('done')
+    url = "http://localhost:" + port
+    requests.post("http://localhost:4400/register/", data={"url": url})

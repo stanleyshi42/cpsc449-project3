@@ -42,14 +42,14 @@ def create_poll(
             Item={
                 "p_key": "POL#" + str(poll_id),
                 "s_key": "POL#" + str(poll_id),
-                "attributes": {"Question:": question}
+                "attributes": {"Question:": question},
             }
         )
         table.put_item(
             Item={
                 "p_key": "POL#" + str(poll_id),
                 "s_key": "OPT#" + str(poll_id),
-                "attributes": attributes
+                "attributes": attributes,
             }
         )
         poll_id += 1
@@ -74,7 +74,7 @@ def retrieve_poll(poll_id: hug.types.number, response):
 
     poll = {}
 
-    #TODO
+    # TODO
     try:
         response = table.get_item(Key={"p_key": poll_id, "s_key": poll_id})
         # response = table.get_item(Key={"p_key": poll_id, "s_key": opt_id})
@@ -83,11 +83,11 @@ def retrieve_poll(poll_id: hug.types.number, response):
     print(response)
     return response["Item"]
 
+
 @hug.startup()
 @hug.post(status=hug.falcon.HTTP_201)
 def register(url: hug.types.text):
     """Register with the Service Registry"""
     port = os.environ.get("PORT")
-    url = 'http://localhost:'+port
-    requests.post("http://localhost:4400/register/",data={'url':url})
-    print('done')
+    url = "http://localhost:" + port
+    requests.post("http://localhost:4400/register/", data={"url": url})

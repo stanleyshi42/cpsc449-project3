@@ -19,9 +19,11 @@ def authenticate_user(username, password):
         return user
     return False
 
+
 @hug.get("/health-check/")
 def health():
     return {"health": "alive"}
+
 
 @hug.get("/public_timeline/")
 def public_timeline():
@@ -114,11 +116,11 @@ def create_post(
     response.set_header("Location", f"/posts/{post['id']}")
     return post
 
+
 @hug.startup()
 @hug.post(status=hug.falcon.HTTP_201)
 def register(url: hug.types.text):
     """Register with the Service Registry"""
     port = os.environ.get("PORT")
-    url = 'http://localhost:'+port
-    requests.post("http://localhost:4400/register/",data={'url':url})
-    print('done')
+    url = "http://localhost:" + port
+    requests.post("http://localhost:4400/register/", data={"url": url})
