@@ -11,7 +11,7 @@ db = Database(sqlite3.connect("./var/posts.db"))
 
 def authenticate_user(username, password):
     """Authenticates a user"""
-    r = requests.get("http://localhost:8000/users/" + username)
+    r = requests.get("http://localhost:4000/users/" + username)
     user = r.json()
     user = user["users"][0]  # Gets the user we want to auth
 
