@@ -6,19 +6,6 @@ import time
 services = []  # Holds address of each service
 
 
-def check_service():
-    """Periodically performs a health check on each service in the registry"""
-    while True:
-        global services
-        for url in services:
-            r = requests.get(url + "/health-check")
-            # Remove service if it doesn't pass health check
-            if r.status_code != 200:
-                services.remove(url)
-
-        time.sleep(60)
-
-
 @hug.post("/register/", status=hug.falcon.HTTP_201)
 def register(
     url: hug.types.text,
@@ -34,6 +21,20 @@ def register(
         response.status = hug.falcon.HTTP_409
         return {"error": str(e)}
     return url
+
+
+def check_service():
+    """Periodically performs a health check on each service in the registry"""
+    while True:
+        global services
+        for url in services:
+            r = requests.get(url + "/health-check")
+            print('Health check:', url)
+            # Remove service if it doesn't pass health check
+            if r.status_code != 200:
+                services.remove(url)
+
+        time.sleep(60)
 
 
 # @hug.startup()
